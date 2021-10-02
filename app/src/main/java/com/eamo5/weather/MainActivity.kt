@@ -1,15 +1,26 @@
 package com.eamo5.weather
 
 import android.os.Bundle
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.eamo5.weather.api.LocationData
+import com.eamo5.weather.api.WeatherApi
 import com.eamo5.weather.databinding.ActivityMainBinding
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
+const val BASE_URL = "https://www.metaweather.com/api/location/"
 
 class MainActivity : AppCompatActivity() {
+
+    var cityID: Int = 0
 
     private lateinit var binding: ActivityMainBinding
 
@@ -31,5 +42,37 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        getLocationData()
+
+    }
+
+    private fun getLocationData() {
+        val retrofitBuilder = Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(BASE_URL)
+            .build()
+            .create(WeatherApi::class.java)
+
+        val retrofitGetData = retrofitBuilder.getData()
+
+        retrofitGetData.enqueue(object : Callback<List<LocationData>?> {
+            override fun onResponse(
+                call: Call<List<LocationData>?>,
+                response: Response<List<LocationData>?>
+            ) {
+                val responseBody = response.body()
+
+                if (responseBody != null) {
+                    for (myData in responseBody) {
+                        cityID = myData.cityID
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<List<LocationData>?>, t: Throwable) {
+                TODO("Not yet implemented")
+            }
+        })
     }
 }

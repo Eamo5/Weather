@@ -68,21 +68,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getLocationData(context: Context) {
-        // 5mb cache
-        val cacheSize = (5 * 1024 * 1024).toLong()
-        val myCache = Cache(context.cacheDir, cacheSize)
 
-        val okHttpClient = OkHttpClient.Builder()
-            .cache(myCache)
-            .addInterceptor { chain ->
-                var request = chain.request()
-                request = if (hasNetwork(context))
-                    request.newBuilder().header("Cache-Control", "public, max-age=" + 5).build()
-                else
-                    request.newBuilder().header("Cache-Control", "public, only-if-cached, max-stale=" + 60 * 60 * 24 * 7).build()
-                chain.proceed(request)
-            }
-            .build()
+        val okHttpClient = retrofitCache(context, 5)
 
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
@@ -111,6 +98,25 @@ class MainActivity : AppCompatActivity() {
                 TODO("Not yet implemented")
             }
         })
+    }
+
+    private fun retrofitCache(context: Context, size: Int): OkHttpClient {
+        // 5mb cache
+        val cacheSize = (size * 1024 * 1024).toLong()
+        val myCache = Cache(context.cacheDir, cacheSize)
+
+        val okHttpClient = OkHttpClient.Builder()
+            .cache(myCache)
+            .addInterceptor { chain ->
+                var request = chain.request()
+                request = if (hasNetwork(context))
+                    request.newBuilder().header("Cache-Control", "public, max-age=" + 5).build()
+                else
+                    request.newBuilder().header("Cache-Control", "public, only-if-cached, max-stale=" + 60 * 60 * 24 * 7).build()
+                chain.proceed(request)
+            }
+            .build()
+        return okHttpClient
     }
 
     private fun hasNetwork(context: Context): Boolean {

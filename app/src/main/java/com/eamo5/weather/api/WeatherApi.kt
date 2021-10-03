@@ -8,4 +8,6 @@ interface WeatherApi {
     @GET("search/?query=melbourne")
     fun getData(): Call<List<LocationData>>
 
+    @GET("1103816")
+    fun getWeatherData(): Call<List<WeatherData>>
 }

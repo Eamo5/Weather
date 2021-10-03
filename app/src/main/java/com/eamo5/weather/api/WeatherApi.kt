@@ -6,8 +6,11 @@ import retrofit2.http.GET
 interface WeatherApi {
 
     @GET("search/?query=melbourne")
-    fun getData(): Call<List<LocationData>>
+    fun getLocationData(): Call<List<LocationData>>
 
     @GET("1103816")
-    fun getWeatherData(): Call<List<WeatherData>>
+    fun getWeatherData(): Call<WeatherData>
+
+    /*@GET("1103816")
+    fun getConsolidatedWeather(): Call<ConsolidatedWeather>*/
 }

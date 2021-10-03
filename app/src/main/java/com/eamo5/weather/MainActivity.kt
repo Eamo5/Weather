@@ -14,6 +14,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.eamo5.weather.api.LocationData
 import com.eamo5.weather.api.WeatherApi
+import com.eamo5.weather.api.WeatherData
 import com.eamo5.weather.databinding.ActivityMainBinding
 import com.eamo5.weather.ui.home.HomeViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -24,6 +25,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import kotlin.math.roundToInt
 
 const val BASE_URL = "https://www.metaweather.com/api/location/"
 
@@ -61,10 +63,19 @@ class MainActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.location).text = location
         }
 
+        // Create the observer which updates the UI.
+        val temperatureObserver = Observer<String> { temperature ->
+            // Update the UI, in this case, a TextView.
+            findViewById<TextView>(R.id.temperature).text = temperature
+        }
+
         // API calls
         getLocationData(this)
+        getWeatherData(this)
 
         homeViewModel.currentLocation.observe(this, locationObserver)
+        homeViewModel.currentTemperature.observe(this, temperatureObserver)
+
     }
 
     private fun getLocationData(context: Context) {
@@ -78,7 +89,7 @@ class MainActivity : AppCompatActivity() {
             .build()
             .create(WeatherApi::class.java)
 
-        val retrofitGetData = retrofitBuilder.getData()
+        val retrofitGetData = retrofitBuilder.getLocationData()
 
         retrofitGetData.enqueue(object : Callback<List<LocationData>?> {
             override fun onResponse(
@@ -95,6 +106,34 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<List<LocationData>?>, t: Throwable) {
+                TODO("Not yet implemented")
+            }
+        })
+    }
+
+    private fun getWeatherData(context: Context) {
+
+        val okHttpClient = retrofitCache(context, 5)
+
+        val retrofitBuilder = Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .build()
+            .create(WeatherApi::class.java)
+
+        val retrofitGetData = retrofitBuilder.getWeatherData()
+
+        retrofitGetData.enqueue(object : Callback<WeatherData?> {
+            override fun onResponse(call: Call<WeatherData?>, response: Response<WeatherData?>) {
+                val responseBody = response.body()
+                responseBody?.let{
+                    homeViewModel.currentTemperature.value =
+                        it.consolidated_weather[0].max_temp.roundToInt().toString() + "°C"
+                }
+            }
+
+            override fun onFailure(call: Call<WeatherData?>, t: Throwable) {
                 TODO("Not yet implemented")
             }
         })

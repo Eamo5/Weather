@@ -1,5 +1,8 @@
 package com.eamo5.weather
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -10,6 +13,8 @@ import com.eamo5.weather.api.LocationData
 import com.eamo5.weather.api.WeatherApi
 import com.eamo5.weather.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import okhttp3.Cache
+import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -43,14 +48,31 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        getLocationData()
+        getLocationData(this)
 
     }
 
-    private fun getLocationData() {
+    private fun getLocationData(context: Context) {
+        // 5mb cache
+        val cacheSize = (5 * 1024 * 1024).toLong()
+        val myCache = Cache(context.cacheDir, cacheSize)
+
+        val okHttpClient = OkHttpClient.Builder()
+            .cache(myCache)
+            .addInterceptor { chain ->
+                var request = chain.request()
+                request = if (hasNetwork(context))
+                    request.newBuilder().header("Cache-Control", "public, max-age=" + 5).build()
+                else
+                    request.newBuilder().header("Cache-Control", "public, only-if-cached, max-stale=" + 60 * 60 * 24 * 7).build()
+                chain.proceed(request)
+            }
+            .build()
+
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(BASE_URL)
+            .client(okHttpClient)
             .build()
             .create(WeatherApi::class.java)
 
@@ -74,5 +96,21 @@ class MainActivity : AppCompatActivity() {
                 TODO("Not yet implemented")
             }
         })
+    }
+
+    private fun hasNetwork(context: Context): Boolean {
+        val isConnected: Boolean
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connManager = connectivityManager.activeNetwork?: return false
+        val activeNetwork =
+            connectivityManager.getNetworkCapabilities(connManager)?: return false
+        isConnected = when {
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+            else -> false
+        }
+        return isConnected
     }
 }

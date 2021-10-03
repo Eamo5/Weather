@@ -4,7 +4,10 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
+import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -12,6 +15,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.eamo5.weather.api.LocationData
 import com.eamo5.weather.api.WeatherApi
 import com.eamo5.weather.databinding.ActivityMainBinding
+import com.eamo5.weather.ui.home.HomeViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -25,13 +29,14 @@ const val BASE_URL = "https://www.metaweather.com/api/location/"
 
 class MainActivity : AppCompatActivity() {
 
-    var cityID: Int = 0
-
     private lateinit var binding: ActivityMainBinding
+
+    private val homeViewModel: HomeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Boilerplate
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -48,8 +53,18 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
+        // ViewModels
+
+        // Create the observer which updates the UI.
+        val locationObserver = Observer<String> { location ->
+            // Update the UI, in this case, a TextView.
+            findViewById<TextView>(R.id.location).text = location
+        }
+
+        // API calls
         getLocationData(this)
 
+        homeViewModel.currentLocation.observe(this, locationObserver)
     }
 
     private fun getLocationData(context: Context) {
@@ -87,7 +102,7 @@ class MainActivity : AppCompatActivity() {
 
                 if (responseBody != null) {
                     for (myData in responseBody) {
-                        cityID = myData.cityID
+                        homeViewModel.currentLocation.value = myData.location
                     }
                 }
             }

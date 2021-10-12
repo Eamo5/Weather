@@ -4,9 +4,11 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -152,21 +154,50 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<WeatherData?>, response: Response<WeatherData?>) {
                 val responseBody = response.body()
                 responseBody?.let {
+                    // ImageViews
+                    val currentWeatherIcon = findViewById<ImageView>(R.id.weatherIcon)
+                    val weatherDay1Icon = findViewById<ImageView>(R.id.day1WeatherIcon)
+                    val weatherDay2Icon = findViewById<ImageView>(R.id.day2WeatherIcon)
+                    val weatherDay3Icon = findViewById<ImageView>(R.id.day3WeatherIcon)
+                    val weatherDay4Icon = findViewById<ImageView>(R.id.day4WeatherIcon)
+                    val weatherDay5Icon = findViewById<ImageView>(R.id.day5WeatherIcon)
+                    val weatherDay6Icon = findViewById<ImageView>(R.id.day6WeatherIcon)
+
                     // Update weather values for each day
+                    // Today
                     homeViewModel.currentTemperature.value =
                         formatTemp(it.consolidated_weather[0].the_temp)
+                    setWeatherIcon(currentWeatherIcon, it.consolidated_weather[0].weather_state_abbr)
+
+                    // Day 1
                     homeViewModel.day1Weather.value =
                         formatTemp(it.consolidated_weather[0].max_temp)
+                    setWeatherIcon(weatherDay1Icon, it.consolidated_weather[0].weather_state_abbr)
+
+                    // Day 2
                     homeViewModel.day2Weather.value =
                         formatTemp(it.consolidated_weather[1].max_temp)
+                    setWeatherIcon(weatherDay2Icon, it.consolidated_weather[1].weather_state_abbr)
+
+                    // Day 3
                     homeViewModel.day3Weather.value =
                         formatTemp(it.consolidated_weather[2].max_temp)
+                    setWeatherIcon(weatherDay3Icon, it.consolidated_weather[2].weather_state_abbr)
+
+                    // Day 4
                     homeViewModel.day4Weather.value =
                         formatTemp(it.consolidated_weather[3].max_temp)
+                    setWeatherIcon(weatherDay4Icon, it.consolidated_weather[3].weather_state_abbr)
+
+                    // Day 5
                     homeViewModel.day5Weather.value =
                         formatTemp(it.consolidated_weather[4].max_temp)
+                    setWeatherIcon(weatherDay5Icon, it.consolidated_weather[4].weather_state_abbr)
+
+                    // Day 6
                     homeViewModel.day6Weather.value =
                         formatTemp(it.consolidated_weather[5].max_temp)
+                    setWeatherIcon(weatherDay6Icon, it.consolidated_weather[5].weather_state_abbr)
                 }
             }
 
@@ -181,6 +212,28 @@ class MainActivity : AppCompatActivity() {
         return temp.roundToInt().toString() + "°C"
     }
 
+    private fun setWeatherIcon(image: ImageView, state: String) {
+        when (state) {
+            "c" -> image.setImageDrawable((AppCompatResources.getDrawable
+                (this@MainActivity, R.drawable.ic_clear)))
+            "hc" -> image.setImageDrawable((AppCompatResources.getDrawable
+                (this@MainActivity, R.drawable.ic_heavy_cloud)))
+            "hr" -> image.setImageDrawable((AppCompatResources.getDrawable
+                (this@MainActivity, R.drawable.ic_heavy_rain)))
+            "lc" -> image.setImageDrawable((AppCompatResources.getDrawable
+                (this@MainActivity, R.drawable.ic_light_cloud)))
+            "lr" -> image.setImageDrawable((AppCompatResources.getDrawable
+                (this@MainActivity, R.drawable.ic_light_rain)))
+            "s" -> image.setImageDrawable((AppCompatResources.getDrawable
+                (this@MainActivity, R.drawable.ic_showers)))
+            "sl" -> image.setImageDrawable((AppCompatResources.getDrawable
+                (this@MainActivity, R.drawable.ic_sleet)))
+            "sn" -> image.setImageDrawable((AppCompatResources.getDrawable
+                (this@MainActivity, R.drawable.ic_snow)))
+            "t" -> image.setImageDrawable((AppCompatResources.getDrawable
+                (this@MainActivity, R.drawable.ic_thunderstorm)))
+        }
+    }
     private fun retrofitCache(context: Context, size: Int): OkHttpClient {
         // 5mb cache
         val cacheSize = (size * 1024 * 1024).toLong()

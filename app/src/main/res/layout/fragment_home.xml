@@ -8,11 +8,10 @@
 
     <ImageView
         android:id="@+id/weatherIcon"
-        android:layout_width="147dp"
-        android:layout_height="133dp"
+        android:layout_width="85dp"
+        android:layout_height="64dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
@@ -44,11 +43,12 @@
         android:id="@+id/day12Layout"
         android:layout_width="415dp"
         android:layout_height="170dp"
-        android:layout_marginBottom="340dp"
+        android:layout_marginBottom="392dp"
         android:orientation="horizontal"
         android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent">
 
         <androidx.cardview.widget.CardView
@@ -133,12 +133,11 @@
         android:id="@+id/day34Layout"
         android:layout_width="415dp"
         android:layout_height="170dp"
-        android:layout_marginBottom="172dp"
+        android:layout_marginBottom="220dp"
         android:orientation="horizontal"
         android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.25"
         app:layout_constraintStart_toStartOf="parent">
 
         <androidx.cardview.widget.CardView
@@ -223,11 +222,12 @@
         android:id="@+id/day56Layout"
         android:layout_width="415dp"
         android:layout_height="170dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="48dp"
         android:orientation="horizontal"
         android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.25"
         app:layout_constraintStart_toStartOf="parent">
 
         <androidx.cardview.widget.CardView

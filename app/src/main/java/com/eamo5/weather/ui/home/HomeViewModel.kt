@@ -17,4 +17,12 @@ class HomeViewModel : ViewModel() {
     val currentTemperature: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
+
+    val day1Weather: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    val day2Weather: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
 }

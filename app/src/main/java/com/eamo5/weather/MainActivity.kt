@@ -69,13 +69,25 @@ class MainActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.temperature).text = temperature
         }
 
+        // Create the observer which updates the UI.
+        val day1Weather = Observer<String> { day1Weather ->
+            // Update the UI, in this case, a TextView.
+            findViewById<TextView>(R.id.day1Weather).text = day1Weather
+        }
+
+        val day2Weather = Observer<String> { day2Weather ->
+            // Update the UI, in this case, a TextView.
+            findViewById<TextView>(R.id.day2Weather).text = day2Weather
+        }
+
         // API calls
         getLocationData(this)
         getWeatherData(this)
 
         homeViewModel.currentLocation.observe(this, locationObserver)
         homeViewModel.currentTemperature.observe(this, temperatureObserver)
-
+        homeViewModel.day1Weather.observe(this, day1Weather)
+        homeViewModel.day2Weather.observe(this, day2Weather)
     }
 
     private fun getLocationData(context: Context) {
@@ -130,6 +142,10 @@ class MainActivity : AppCompatActivity() {
                 responseBody?.let {
                     homeViewModel.currentTemperature.value =
                         it.consolidated_weather[0].the_temp.roundToInt().toString() + "°C"
+                    homeViewModel.day1Weather.value =
+                        it.consolidated_weather[0].max_temp.roundToInt().toString() + "°C"
+                    homeViewModel.day2Weather.value =
+                        it.consolidated_weather[1].max_temp.roundToInt().toString() + "°C"
                 }
             }
 

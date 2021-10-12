@@ -141,11 +141,11 @@ class MainActivity : AppCompatActivity() {
                 val responseBody = response.body()
                 responseBody?.let {
                     homeViewModel.currentTemperature.value =
-                        it.consolidated_weather[0].the_temp.roundToInt().toString() + "°C"
+                        formatTemp(it.consolidated_weather[0].the_temp)
                     homeViewModel.day1Weather.value =
-                        it.consolidated_weather[0].max_temp.roundToInt().toString() + "°C"
+                        formatTemp(it.consolidated_weather[0].max_temp)
                     homeViewModel.day2Weather.value =
-                        it.consolidated_weather[1].max_temp.roundToInt().toString() + "°C"
+                        formatTemp(it.consolidated_weather[1].max_temp)
                 }
             }
 
@@ -153,6 +153,11 @@ class MainActivity : AppCompatActivity() {
                 TODO("Not yet implemented")
             }
         })
+    }
+
+    // Format temperature for displaying in TextView as Celsius
+    private fun formatTemp(temp: Double): String {
+        return temp.roundToInt().toString() + "°C"
     }
 
     private fun retrofitCache(context: Context, size: Int): OkHttpClient {

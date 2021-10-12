@@ -55,39 +55,51 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        // ViewModels
+        // API calls
+        getLocationData(this)
+        getWeatherData(this)
 
-        // Create the observer which updates the UI.
+        // Observers
         val locationObserver = Observer<String> { location ->
-            // Update the UI, in this case, a TextView.
             findViewById<TextView>(R.id.location).text = location
         }
 
-        // Create the observer which updates the UI.
         val temperatureObserver = Observer<String> { temperature ->
-            // Update the UI, in this case, a TextView.
             findViewById<TextView>(R.id.temperature).text = temperature
         }
 
-        // Create the observer which updates the UI.
         val day1Weather = Observer<String> { day1Weather ->
-            // Update the UI, in this case, a TextView.
             findViewById<TextView>(R.id.day1Weather).text = day1Weather
         }
 
         val day2Weather = Observer<String> { day2Weather ->
-            // Update the UI, in this case, a TextView.
             findViewById<TextView>(R.id.day2Weather).text = day2Weather
         }
 
-        // API calls
-        getLocationData(this)
-        getWeatherData(this)
+        val day3Weather = Observer<String> { day3Weather ->
+            findViewById<TextView>(R.id.day3Weather).text = day3Weather
+        }
+
+        val day4Weather = Observer<String> { day4Weather ->
+            findViewById<TextView>(R.id.day4Weather).text = day4Weather
+        }
+
+        val day5Weather = Observer<String> { day5Weather ->
+            findViewById<TextView>(R.id.day5Weather).text = day5Weather
+        }
+
+        val day6Weather = Observer<String> { day6Weather ->
+            findViewById<TextView>(R.id.day6Weather).text = day6Weather
+        }
 
         homeViewModel.currentLocation.observe(this, locationObserver)
         homeViewModel.currentTemperature.observe(this, temperatureObserver)
         homeViewModel.day1Weather.observe(this, day1Weather)
         homeViewModel.day2Weather.observe(this, day2Weather)
+        homeViewModel.day3Weather.observe(this, day3Weather)
+        homeViewModel.day4Weather.observe(this, day4Weather)
+        homeViewModel.day5Weather.observe(this, day5Weather)
+        homeViewModel.day6Weather.observe(this, day6Weather)
     }
 
     private fun getLocationData(context: Context) {
@@ -140,12 +152,21 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<WeatherData?>, response: Response<WeatherData?>) {
                 val responseBody = response.body()
                 responseBody?.let {
+                    // Update weather values for each day
                     homeViewModel.currentTemperature.value =
                         formatTemp(it.consolidated_weather[0].the_temp)
                     homeViewModel.day1Weather.value =
                         formatTemp(it.consolidated_weather[0].max_temp)
                     homeViewModel.day2Weather.value =
                         formatTemp(it.consolidated_weather[1].max_temp)
+                    homeViewModel.day3Weather.value =
+                        formatTemp(it.consolidated_weather[2].max_temp)
+                    homeViewModel.day4Weather.value =
+                        formatTemp(it.consolidated_weather[3].max_temp)
+                    homeViewModel.day5Weather.value =
+                        formatTemp(it.consolidated_weather[4].max_temp)
+                    homeViewModel.day6Weather.value =
+                        formatTemp(it.consolidated_weather[5].max_temp)
                 }
             }
 

@@ -25,4 +25,20 @@ class HomeViewModel : ViewModel() {
     val day2Weather: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
+
+    val day3Weather: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    val day4Weather: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    val day5Weather: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    val day6Weather: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
 }

@@ -40,35 +40,67 @@ class HomeFragment : Fragment() {
         val day = calendar.get(Calendar.DAY_OF_WEEK)
         val day1 = root.findViewById<TextView>(R.id.day1)
         val day2 = root.findViewById<TextView>(R.id.day2)
+        val day3 = root.findViewById<TextView>(R.id.day3)
+        val day4 = root.findViewById<TextView>(R.id.day4)
+        val day5 = root.findViewById<TextView>(R.id.day5)
+        val day6 = root.findViewById<TextView>(R.id.day6)
 
         when (day) {
             Calendar.SUNDAY -> {
-                day1.text = "Sunday"
+                day1.text = "Today"
                 day2.text = "Monday"
+                day3.text = "Tuesday"
+                day4.text = "Wednesday"
+                day5.text = "Thursday"
+                day6.text = "Friday"
             }
             Calendar.MONDAY -> {
-                day1.text = "Monday"
+                day1.text = "Today"
                 day2.text = "Tuesday"
+                day3.text = "Wednesday"
+                day4.text = "Thursday"
+                day5.text = "Friday"
+                day6.text = "Saturday"
             }
             Calendar.TUESDAY -> {
-                day1.text = "Tuesday"
+                day1.text = "Today"
                 day2.text = "Wednesday"
+                day3.text = "Thursday"
+                day4.text = "Friday"
+                day5.text = "Saturday"
+                day6.text = "Sunday"
             }
             Calendar.WEDNESDAY -> {
-                day1.text = "Wednesday"
+                day1.text = "Today"
                 day2.text = "Thursday"
+                day3.text = "Friday"
+                day4.text = "Saturday"
+                day5.text = "Sunday"
+                day6.text = "Monday"
             }
             Calendar.THURSDAY -> {
-                day1.text = "Thursday"
+                day1.text = "Today"
                 day2.text = "Friday"
+                day3.text = "Saturday"
+                day4.text = "Sunday"
+                day5.text = "Monday"
+                day6.text = "Tuesday"
             }
             Calendar.FRIDAY -> {
-                day1.text = "Friday"
+                day1.text = "Today"
                 day2.text = "Saturday"
+                day3.text = "Sunday"
+                day4.text = "Monday"
+                day5.text = "Tuesday"
+                day6.text = "Wednesday"
             }
             Calendar.SATURDAY -> {
-                day1.text = "Saturday"
+                day1.text = "Today"
                 day2.text = "Sunday"
+                day3.text = "Monday"
+                day4.text = "Tuesday"
+                day5.text = "Wednesday"
+                day6.text = "Thursday"
             }
         }
 

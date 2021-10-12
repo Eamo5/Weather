@@ -127,9 +127,9 @@ class MainActivity : AppCompatActivity() {
         retrofitGetData.enqueue(object : Callback<WeatherData?> {
             override fun onResponse(call: Call<WeatherData?>, response: Response<WeatherData?>) {
                 val responseBody = response.body()
-                responseBody?.let{
+                responseBody?.let {
                     homeViewModel.currentTemperature.value =
-                        it.consolidated_weather[0].max_temp.roundToInt().toString() + "°C"
+                        it.consolidated_weather[0].the_temp.roundToInt().toString() + "°C"
                 }
             }
 

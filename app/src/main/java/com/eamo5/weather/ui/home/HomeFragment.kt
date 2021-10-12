@@ -1,6 +1,9 @@
 package com.eamo5.weather.ui.home
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +17,7 @@ import java.util.*
 class HomeFragment : Fragment() {
 
     private lateinit var homeViewModel: HomeViewModel
+    private lateinit var temp: TextView
     private var _binding: FragmentHomeBinding? = null
 
     // This property is only valid between onCreateView and
@@ -25,6 +29,7 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.i("CREATE", "CREATE")
         homeViewModel =
             ViewModelProvider(this).get(HomeViewModel::class.java)
 
@@ -104,11 +109,31 @@ class HomeFragment : Fragment() {
             }
         }
 
+        temp = root.findViewById(R.id.temperature)
+
+        val sharedPref = this.activity?.getSharedPreferences(
+            "pref", Context.MODE_PRIVATE)
+        val todayTemp = sharedPref?.getString("todayTemp", "-")
+
+        temp.text = todayTemp
+
         return root
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.i("PAUSED", "PAUSED")
+        val sharedPref: SharedPreferences? = this.activity?.getPreferences(Context.MODE_PRIVATE)
+        with (sharedPref?.edit()) {
+            this?.putString("todayTemp", temp.text.toString())
+            this?.apply()
+        }
+
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        Log.i("DESTROY", "DESTROYED")
         _binding = null
     }
 }

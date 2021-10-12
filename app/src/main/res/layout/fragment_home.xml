@@ -40,9 +40,9 @@
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="406dp"
-        android:layout_height="167dp"
-        android:layout_marginBottom="300dp"
+        android:layout_width="415dp"
+        android:layout_height="192dp"
+        android:layout_marginBottom="280dp"
         android:orientation="horizontal"
         android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -60,12 +60,23 @@
                 android:layout_height="match_parent">
 
                 <TextView
-                    android:id="@+id/monday"
+                    android:id="@+id/day1"
                     style="@style/dashboardSubheading"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/mondayWeather"
-                    android:text="Monday" />
+                    android:text="-" />
+
+                <TextView
+                    android:id="@+id/day1Weather"
+                    style="@style/dashboardSubheading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/day1"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="7dp"
+                    android:text="-" />
 
                 <ImageView
                     android:id="@+id/mondayWeather"
@@ -87,12 +98,21 @@
                 android:layout_height="match_parent">
 
                 <TextView
-                    android:id="@+id/tuesday"
+                    android:id="@+id/day2"
                     style="@style/dashboardSubheading"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tuesdayWeather"
                     android:text="Tuesday" />
+
+                <TextView
+                    android:id="@+id/day2Weather"
+                    style="@style/dashboardSubheading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/day2"
+                    android:layout_marginTop="9dp"
+                    android:text="-" />
 
                 <ImageView
                     android:id="@+id/tuesdayWeather"

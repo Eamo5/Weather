@@ -3,7 +3,6 @@ package com.eamo5.weather.ui.home
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +16,15 @@ import java.util.*
 class HomeFragment : Fragment() {
 
     private lateinit var homeViewModel: HomeViewModel
-    private lateinit var temp: TextView
+    private lateinit var location: TextView
+    private lateinit var currentTemp: TextView
+    private lateinit var day1Weather: TextView
+    private lateinit var day2Weather: TextView
+    private lateinit var day3Weather: TextView
+    private lateinit var day4Weather: TextView
+    private lateinit var day5Weather: TextView
+    private lateinit var day6Weather: TextView
+
     private var _binding: FragmentHomeBinding? = null
 
     // This property is only valid between onCreateView and
@@ -29,7 +36,6 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Log.i("CREATE", "CREATE")
         homeViewModel =
             ViewModelProvider(this).get(HomeViewModel::class.java)
 
@@ -109,23 +115,43 @@ class HomeFragment : Fragment() {
             }
         }
 
-        temp = root.findViewById(R.id.temperature)
+        // Get element IDs
+        location = root.findViewById(R.id.location)
+        currentTemp = root.findViewById(R.id.temperature)
+        day1Weather = root.findViewById(R.id.day1Weather)
+        day2Weather = root.findViewById(R.id.day2Weather)
+        day3Weather = root.findViewById(R.id.day3Weather)
+        day4Weather = root.findViewById(R.id.day4Weather)
+        day5Weather = root.findViewById(R.id.day5Weather)
+        day6Weather = root.findViewById(R.id.day6Weather)
 
-        val sharedPref = this.activity?.getSharedPreferences(
-            "pref", Context.MODE_PRIVATE)
-        val todayTemp = sharedPref?.getString("todayTemp", "-")
 
-        temp.text = todayTemp
+        // Get Shared Preferences
+        val sharedPref = this.activity?.getPreferences(Context.MODE_PRIVATE)
+        location.text = sharedPref?.getString("currentLocation", "-")
+        currentTemp.text = sharedPref?.getString("currentTemp", "-")
+        day1Weather.text = sharedPref?.getString("day1Weather", "-")
+        day2Weather.text = sharedPref?.getString("day2Weather", "-")
+        day3Weather.text = sharedPref?.getString("day3Weather", "-")
+        day4Weather.text = sharedPref?.getString("day4Weather", "-")
+        day5Weather.text = sharedPref?.getString("day5Weather", "-")
+        day6Weather.text = sharedPref?.getString("day6Weather", "-")
 
         return root
     }
 
     override fun onPause() {
         super.onPause()
-        Log.i("PAUSED", "PAUSED")
         val sharedPref: SharedPreferences? = this.activity?.getPreferences(Context.MODE_PRIVATE)
         with (sharedPref?.edit()) {
-            this?.putString("todayTemp", temp.text.toString())
+            this?.putString("currentLocation", location.text.toString())
+            this?.putString("currentTemp", currentTemp.text.toString())
+            this?.putString("day1Weather", day1Weather.text.toString())
+            this?.putString("day2Weather", day2Weather.text.toString())
+            this?.putString("day3Weather", day3Weather.text.toString())
+            this?.putString("day4Weather", day4Weather.text.toString())
+            this?.putString("day5Weather", day5Weather.text.toString())
+            this?.putString("day6Weather", day6Weather.text.toString())
             this?.apply()
         }
 
@@ -133,7 +159,6 @@ class HomeFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.i("DESTROY", "DESTROYED")
         _binding = null
     }
 }

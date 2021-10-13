@@ -6,10 +6,8 @@ import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -18,7 +16,6 @@ import com.eamo5.weather.api.LocationData
 import com.eamo5.weather.api.WeatherApi
 import com.eamo5.weather.api.WeatherData
 import com.eamo5.weather.databinding.ActivityMainBinding
-import com.eamo5.weather.ui.home.HomeViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -34,16 +31,49 @@ const val BASE_URL = "https://www.metaweather.com/api/location/"
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
-    private val homeViewModel: HomeViewModel by viewModels()
+    private lateinit var homeImageViews: List<ImageView>
+    private lateinit var homeTextViews: List<TextView>
+    private lateinit var currentLocation: TextView
+    private lateinit var currentTemperature: TextView
+    private lateinit var currentWeatherIcon: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Boilerplate
+        // Binding
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // TextViews
+        currentLocation = findViewById(R.id.location)
+        currentTemperature = findViewById(R.id.temperature)
+
+        homeTextViews = listOf<TextView>(
+            findViewById(R.id.day1Weather),
+            findViewById(R.id.day2Weather),
+            findViewById(R.id.day3Weather),
+            findViewById(R.id.day4Weather),
+            findViewById(R.id.day5Weather),
+            findViewById(R.id.day6Weather),
+        )
+
+        // ImageViews
+        currentWeatherIcon = findViewById(R.id.weatherIcon)
+
+        homeImageViews = listOf<ImageView>(
+            findViewById(R.id.day1WeatherIcon),
+            findViewById(R.id.day2WeatherIcon),
+            findViewById(R.id.day3WeatherIcon),
+            findViewById(R.id.day4WeatherIcon),
+            findViewById(R.id.day5WeatherIcon),
+            findViewById(R.id.day6WeatherIcon),
+        )
+
+        // API calls
+        getLocationData(this)
+        getWeatherData(this)
+
+        // Navbar
         val navView: BottomNavigationView = binding.navView
 
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
@@ -56,52 +86,6 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-
-        // API calls
-        getLocationData(this)
-        getWeatherData(this)
-
-        // Observers
-        val locationObserver = Observer<String> { location ->
-            findViewById<TextView>(R.id.location).text = location
-        }
-
-        val temperatureObserver = Observer<String> { temperature ->
-            findViewById<TextView>(R.id.temperature).text = temperature
-        }
-
-        val day1Weather = Observer<String> { day1Weather ->
-            findViewById<TextView>(R.id.day1Weather).text = day1Weather
-        }
-
-        val day2Weather = Observer<String> { day2Weather ->
-            findViewById<TextView>(R.id.day2Weather).text = day2Weather
-        }
-
-        val day3Weather = Observer<String> { day3Weather ->
-            findViewById<TextView>(R.id.day3Weather).text = day3Weather
-        }
-
-        val day4Weather = Observer<String> { day4Weather ->
-            findViewById<TextView>(R.id.day4Weather).text = day4Weather
-        }
-
-        val day5Weather = Observer<String> { day5Weather ->
-            findViewById<TextView>(R.id.day5Weather).text = day5Weather
-        }
-
-        val day6Weather = Observer<String> { day6Weather ->
-            findViewById<TextView>(R.id.day6Weather).text = day6Weather
-        }
-
-        homeViewModel.currentLocation.observe(this, locationObserver)
-        homeViewModel.currentTemperature.observe(this, temperatureObserver)
-        homeViewModel.day1Weather.observe(this, day1Weather)
-        homeViewModel.day2Weather.observe(this, day2Weather)
-        homeViewModel.day3Weather.observe(this, day3Weather)
-        homeViewModel.day4Weather.observe(this, day4Weather)
-        homeViewModel.day5Weather.observe(this, day5Weather)
-        homeViewModel.day6Weather.observe(this, day6Weather)
     }
 
     private fun getLocationData(context: Context) {
@@ -126,7 +110,7 @@ class MainActivity : AppCompatActivity() {
 
                 if (responseBody != null) {
                     for (myData in responseBody) {
-                        homeViewModel.currentLocation.value = myData.location
+                        currentLocation.text = myData.location
                     }
                 }
             }
@@ -154,55 +138,34 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<WeatherData?>, response: Response<WeatherData?>) {
                 val responseBody = response.body()
                 responseBody?.let {
-                    // ImageViews
-                    val currentWeatherIcon = findViewById<ImageView>(R.id.weatherIcon)
-                    val weatherDay1Icon = findViewById<ImageView>(R.id.day1WeatherIcon)
-                    val weatherDay2Icon = findViewById<ImageView>(R.id.day2WeatherIcon)
-                    val weatherDay3Icon = findViewById<ImageView>(R.id.day3WeatherIcon)
-                    val weatherDay4Icon = findViewById<ImageView>(R.id.day4WeatherIcon)
-                    val weatherDay5Icon = findViewById<ImageView>(R.id.day5WeatherIcon)
-                    val weatherDay6Icon = findViewById<ImageView>(R.id.day6WeatherIcon)
+                    // States
+                    val states = mutableListOf<String>()
 
-                    // Update weather values for each day
-                    // Today
-                    homeViewModel.currentTemperature.value =
-                        formatTemp(it.consolidated_weather[0].the_temp)
-                    setWeatherIcon(currentWeatherIcon, it.consolidated_weather[0].weather_state_abbr)
+                    // Update weather images / states for each day
+                    homeImageViews.forEachIndexed { index, imageView ->
+                        if (index == 0) {
+                            setWeatherIcon(currentWeatherIcon,
+                                it.consolidated_weather[index].weather_state_abbr)
+                            currentTemperature.text = formatTemp(it.consolidated_weather[0].the_temp)
+                        }
+                        setWeatherIcon(imageView, it.consolidated_weather[index].weather_state_abbr)
+                        states.add(it.consolidated_weather[index].weather_state_abbr)
+                        homeTextViews[index].text = formatTemp(it.consolidated_weather[index].max_temp)
+                    }
 
-                    // Day 1
-                    homeViewModel.day1Weather.value =
-                        formatTemp(it.consolidated_weather[0].max_temp)
-                    setWeatherIcon(weatherDay1Icon, it.consolidated_weather[0].weather_state_abbr)
-
-                    // Day 2
-                    homeViewModel.day2Weather.value =
-                        formatTemp(it.consolidated_weather[1].max_temp)
-                    setWeatherIcon(weatherDay2Icon, it.consolidated_weather[1].weather_state_abbr)
-
-                    // Day 3
-                    homeViewModel.day3Weather.value =
-                        formatTemp(it.consolidated_weather[2].max_temp)
-                    setWeatherIcon(weatherDay3Icon, it.consolidated_weather[2].weather_state_abbr)
-
-                    // Day 4
-                    homeViewModel.day4Weather.value =
-                        formatTemp(it.consolidated_weather[3].max_temp)
-                    setWeatherIcon(weatherDay4Icon, it.consolidated_weather[3].weather_state_abbr)
-
-                    // Day 5
-                    homeViewModel.day5Weather.value =
-                        formatTemp(it.consolidated_weather[4].max_temp)
-                    setWeatherIcon(weatherDay5Icon, it.consolidated_weather[4].weather_state_abbr)
-
-                    // Day 6
-                    homeViewModel.day6Weather.value =
-                        formatTemp(it.consolidated_weather[5].max_temp)
-                    setWeatherIcon(weatherDay6Icon, it.consolidated_weather[5].weather_state_abbr)
+                    // Save associated weather abbreviation for restoring ImageView
+                    val sharedPref = this@MainActivity.getPreferences(Context.MODE_PRIVATE) ?: return
+                    with (sharedPref.edit()) {
+                        states.forEachIndexed { index, s ->
+                            putString("state${index}", s)
+                        }
+                        apply()
+                    }
                 }
             }
 
             override fun onFailure(call: Call<WeatherData?>, t: Throwable) {
-                TODO("Not yet implemented")
+                t.printStackTrace()
             }
         })
     }
@@ -212,7 +175,7 @@ class MainActivity : AppCompatActivity() {
         return temp.roundToInt().toString() + "°C"
     }
 
-    private fun setWeatherIcon(image: ImageView, state: String) {
+    fun setWeatherIcon(image: ImageView, state: String) {
         when (state) {
             "c" -> image.setImageDrawable((AppCompatResources.getDrawable
                 (this@MainActivity, R.drawable.ic_clear)))
@@ -234,6 +197,7 @@ class MainActivity : AppCompatActivity() {
                 (this@MainActivity, R.drawable.ic_thunderstorm)))
         }
     }
+
     private fun retrofitCache(context: Context, size: Int): OkHttpClient {
         // 5mb cache
         val cacheSize = (size * 1024 * 1024).toLong()

@@ -1,5 +1,6 @@
 package com.eamo5.weather.ui.settings
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.eamo5.weather.R
 import com.eamo5.weather.databinding.FragmentSettingsBinding
-import com.eamo5.weather.ui.SettingsAdapter
 
 class SettingsFragment : Fragment() {
 
@@ -34,15 +34,42 @@ class SettingsFragment : Fragment() {
         val root: View = binding.root
 
         val settingsRecyclerView = root.findViewById<RecyclerView>(R.id.settingsRecyclerView)
-        val settingsList = (listOf("Location", "Metric"))
+        val sharedPref = this.activity?.getPreferences(Context.MODE_PRIVATE)
+        sharedPref?.let {
+            if (it.getString("locationSettings", "?") == "?") {
+                with(sharedPref.edit()) {
+                    this.putString("locationSettings", "Melbourne")
+                    this.apply()
+                }
+            }
 
-        // RecyclerView
-        settingsRecyclerView.adapter = SettingsAdapter(settingsList) {
+            if (it.getString("temperatureMetric", "?") == "?") {
+                with(sharedPref.edit()) {
+                    this.putString("temperatureMetric", "°C")
+                    this.apply()
+                }
+            }
 
+            val settingsList = mutableListOf(
+                Settings(
+                    "Location", it.getString("locationSettings", "?"),
+                    R.drawable.ic_location_on_black_24dp
+                ),
+                Settings(
+                    "Metric", it.getString("temperatureMetric", "?"),
+                    R.drawable.ic_thermostat_black_24dp
+                )
+            )
+            // RecyclerView
+            settingsRecyclerView.adapter = activity?.let { context ->
+                SettingsAdapter(settingsList, context) {
+                }
+            }
+            settingsRecyclerView.layoutManager = LinearLayoutManager(activity)
+            val dividerItemDecoration =
+                DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
+            settingsRecyclerView.addItemDecoration(dividerItemDecoration)
         }
-        settingsRecyclerView.layoutManager = LinearLayoutManager(activity)
-        val dividerItemDecoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
-        settingsRecyclerView.addItemDecoration(dividerItemDecoration)
 
         return root
     }

@@ -15,6 +15,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.preference.PreferenceManager
 import com.eamo5.weather.R
 import com.eamo5.weather.api.ConsolidatedWeather
 import com.eamo5.weather.api.LocationData
@@ -349,7 +350,17 @@ class HomeFragment : Fragment() {
 
     // Format temperature for displaying in TextView as Celsius
     fun formatTemp(temp: Double): String {
-        return temp.roundToInt().toString() + "°C"
+        val prefManager = PreferenceManager.getDefaultSharedPreferences(context)
+        return if (prefManager.getString("temperature", "") != "fahrenheit"){
+            temp.roundToInt().toString() + "°C"
+        } else {
+            convertToFahrenheit(temp.roundToInt()).toString() + "°F"
+        }
+    }
+
+    // Convert from celsius to fahrenheit
+    private fun convertToFahrenheit(temp: Int): Int {
+        return (temp * 9/5) + 32
     }
 
     // Show BottomSheetDialogFragment

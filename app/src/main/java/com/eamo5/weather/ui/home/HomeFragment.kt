@@ -216,7 +216,7 @@ class HomeFragment : Fragment() {
             .create(WeatherApi::class.java)
 
         val prefManager = PreferenceManager.getDefaultSharedPreferences(context)
-        val locationSetting = prefManager.getString("location", "").toString()
+        val locationSetting = prefManager.getString("location", "Melbourne").toString()
         Log.d("location", locationSetting)
 
         val retrofitGetData = retrofitBuilder.getLocationData(locationSetting)

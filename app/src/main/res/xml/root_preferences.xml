@@ -1,0 +1,35 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/location_header"
+        app:icon="@drawable/ic_baseline_location_on_24">
+
+        <EditTextPreference
+            app:defaultValue="Melbourne"
+            app:key="Location"
+            app:title="Location"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/metric_header"
+        app:icon="@drawable/ic_baseline_speed_24">
+
+        <ListPreference
+            app:defaultValue="celsius"
+            app:entries="@array/temperature_metric"
+            app:entryValues="@array/temperature_metric_values"
+            app:key="temperature"
+            app:title="@string/temperature_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="kilometers"
+            app:entries="@array/speed_metric"
+            app:entryValues="@array/speed_metric_values"
+            app:key="speed"
+            app:title="@string/speed_title"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

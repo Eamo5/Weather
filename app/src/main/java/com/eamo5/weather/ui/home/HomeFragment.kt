@@ -21,7 +21,6 @@ import com.eamo5.weather.api.LocationData
 import com.eamo5.weather.api.WeatherApi
 import com.eamo5.weather.api.WeatherData
 import com.eamo5.weather.databinding.FragmentHomeBinding
-import com.eamo5.weather.ui.WeatherBottomSheetDialog
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import okhttp3.Cache
@@ -46,7 +45,7 @@ class HomeFragment : Fragment() {
     private lateinit var homeTextViews: List<TextView>
     private lateinit var homeImageViews: List<ImageView>
     private var consolidatedWeather = mutableListOf<ConsolidatedWeather>()
-    private var states = mutableListOf<String>()
+    private var states = arrayOfNulls<String>(6)
 
     private var _binding: FragmentHomeBinding? = null
 
@@ -138,11 +137,12 @@ class HomeFragment : Fragment() {
         homeImageViews.forEachIndexed { index, imageView ->
             val string = sharedPref?.getString("state${index}", "-")
             if (string != "-" && string != null) {
-                states.add(string)
+                states[index] = string
                 setWeatherIcon(imageView, string)
                 if (index == 0) {
                     setWeatherIcon(currentWeatherIcon, string)
                 }
+
             }
         }
 
@@ -164,11 +164,13 @@ class HomeFragment : Fragment() {
         cards.forEachIndexed { index, cardView ->
             cardView.setOnClickListener {
                 if (!states.isNullOrEmpty()) {
-                    showBottomSheetDialog(
-                        consolidatedWeather[index],
-                        location.text.toString(),
-                        states[index]
-                    )
+                    states[index]?.let { it1 ->
+                        showBottomSheetDialog(
+                            consolidatedWeather[index],
+                            location.text.toString(),
+                            it1
+                        )
+                    }
                 } else {
                     Toast.makeText(activity, "Please wait...", Toast.LENGTH_SHORT).show()
                 }
@@ -228,7 +230,7 @@ class HomeFragment : Fragment() {
             }
 
             override fun onFailure(call: Call<List<LocationData>?>, t: Throwable) {
-                TODO("Not yet implemented")
+                t.printStackTrace()
             }
         })
     }
@@ -264,7 +266,7 @@ class HomeFragment : Fragment() {
                         homeTextViews[index].text = formatTemp(it.consolidated_weather[index].max_temp)
                         consolidatedWeather.add(it.consolidated_weather[index])
 
-                        states.add(it.consolidated_weather[index].weather_state_abbr)
+                        states[index] = (it.consolidated_weather[index].weather_state_abbr)
                         with (sharedPref.edit()) {
                             putString("state${index}", states[index])
                             apply()

@@ -1,0 +1,23 @@
+<resources>
+    <!-- Temperature Metric Preference -->
+    <string-array name="temperature_metric">
+        <item>Celsius (°C)</item>
+        <item>Fahrenheit (°F)</item>
+    </string-array>
+
+    <string-array name="temperature_metric_values">
+        <item>celsius</item>
+        <item>fahrenheit</item>
+    </string-array>
+
+    <!-- Speed Metric Preference -->
+    <string-array name="speed_metric">
+        <item>Kilometers (km/h)</item>
+        <item>Miles (mph)</item>
+    </string-array>
+
+    <string-array name="speed_metric_values">
+        <item>kilometers</item>
+        <item>miles</item>
+    </string-array>
+</resources>

@@ -1,4 +1,4 @@
-package com.eamo5.weather.ui
+package com.eamo5.weather.ui.home
 
 import android.os.Bundle
 import android.util.Log
@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.eamo5.weather.R
 import com.eamo5.weather.api.ConsolidatedWeather
-import com.eamo5.weather.ui.home.HomeFragment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class WeatherBottomSheetDialog(private val data: ConsolidatedWeather,

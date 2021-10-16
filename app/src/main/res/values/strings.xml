@@ -3,4 +3,19 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_settings">Settings</string>
+    <!-- Preference Titles -->
+    <string name="location_header">Location</string>
+    <string name="metric_header">Metrics</string>
+
+    <!-- Metric Preferences -->
+    <string name="temperature_title">Temperature Metric</string>
+
+    <string name="speed_title">Speed Metric</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 </resources>

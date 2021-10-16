@@ -20,4 +20,8 @@
         <item name="android:layout_centerHorizontal">true</item>
         <item name="android:textStyle">bold</item>
     </style>
+
+    <!-- Colours -->
+    <color name="blue">#0066FF</color>
+    <color name="light_blue">#1E90FF</color>
 </resources>

@@ -5,7 +5,7 @@
 
         <EditTextPreference
             app:defaultValue="Melbourne"
-            app:key="Location"
+            app:key="location"
             app:title="Location"
             app:useSimpleSummaryProvider="true" />
 

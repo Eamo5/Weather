@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,6 +48,7 @@ class HomeFragment : Fragment() {
     private lateinit var homeImageViews: List<ImageView>
     private var consolidatedWeather = mutableListOf<ConsolidatedWeather>()
     private var states = arrayOfNulls<String>(6)
+    private var woeid = 0
 
     private var _binding: FragmentHomeBinding? = null
 
@@ -103,7 +105,6 @@ class HomeFragment : Fragment() {
         // API calls
         activity?.let {
             getLocationData(it)
-            getWeatherData(it)
         }
 
         // Set days of week
@@ -214,7 +215,11 @@ class HomeFragment : Fragment() {
             .build()
             .create(WeatherApi::class.java)
 
-        val retrofitGetData = retrofitBuilder.getLocationData()
+        val prefManager = PreferenceManager.getDefaultSharedPreferences(context)
+        val locationSetting = prefManager.getString("location", "").toString()
+        Log.d("location", locationSetting)
+
+        val retrofitGetData = retrofitBuilder.getLocationData(locationSetting)
 
         retrofitGetData.enqueue(object : Callback<List<LocationData>?> {
             override fun onResponse(
@@ -226,8 +231,14 @@ class HomeFragment : Fragment() {
                 if (responseBody != null) {
                     for (myData in responseBody) {
                         location.text = myData.location
+                        woeid = myData.cityID
+                        getWeatherData(context)
                     }
                 }
+
+                if (woeid == 0 || locationSetting != location.text)
+                    Toast.makeText(context, "Invalid location", Toast.LENGTH_SHORT).show()
+
             }
 
             override fun onFailure(call: Call<List<LocationData>?>, t: Throwable) {
@@ -247,7 +258,7 @@ class HomeFragment : Fragment() {
             .build()
             .create(WeatherApi::class.java)
 
-        val retrofitGetData = retrofitBuilder.getWeatherData()
+        val retrofitGetData = retrofitBuilder.getWeatherData(woeid)
 
         retrofitGetData.enqueue(object : Callback<WeatherData?> {
             override fun onResponse(call: Call<WeatherData?>, response: Response<WeatherData?>) {
@@ -361,6 +372,19 @@ class HomeFragment : Fragment() {
     // Convert from celsius to fahrenheit
     private fun convertToFahrenheit(temp: Int): Int {
         return (temp * 9/5) + 32
+    }
+
+    fun formatWindSpeed(speed: Double): String {
+        val prefManager = PreferenceManager.getDefaultSharedPreferences(context)
+        return if (prefManager.getString("speed", "") != "kilometers"){
+            speed.roundToInt().toString() + " mph"
+        } else {
+            convertToKilometers(speed).toString() + " km/h"
+        }
+    }
+
+    private fun convertToKilometers(miles: Double): Int  {
+        return (miles * 1.603).roundToInt()
     }
 
     // Show BottomSheetDialogFragment

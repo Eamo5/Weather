@@ -29,6 +29,8 @@ class WeatherBottomSheetDialog(private val data: ConsolidatedWeather,
             "Max: ${(parentFragment as HomeFragment).formatTemp(data.max_temp)}"
         binding.findViewById<TextView>(R.id.bottomSheetTempMin).text =
             "Min: ${(parentFragment as HomeFragment).formatTemp(data.min_temp)}"
+        binding.findViewById<TextView>(R.id.bottomSheetSpeed).text =
+            "Wind: ${(parentFragment as HomeFragment).formatWindSpeed(data.wind_speed)}"
         return binding
     }
 

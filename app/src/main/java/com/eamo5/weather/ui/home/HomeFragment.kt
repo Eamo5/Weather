@@ -236,7 +236,8 @@ class HomeFragment : Fragment() {
                     }
                 }
 
-                if (woeid == 0 || locationSetting != location.text)
+                if (woeid == 0 ||
+                    locationSetting.lowercase() != location.text.toString().lowercase())
                     Toast.makeText(context, "Invalid location", Toast.LENGTH_SHORT).show()
 
             }

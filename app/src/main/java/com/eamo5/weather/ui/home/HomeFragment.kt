@@ -46,8 +46,8 @@ class HomeFragment : Fragment() {
     private lateinit var currentTemp: TextView
     private lateinit var homeTextViews: List<TextView>
     private lateinit var homeImageViews: List<ImageView>
-    private var consolidatedWeather = mutableListOf<ConsolidatedWeather>()
-    private var states = arrayOfNulls<String>(6)
+    private var consolidatedWeather = arrayOfNulls<ConsolidatedWeather>(6)
+    private val states = arrayOfNulls<String>(6)
     private var woeid = 0
 
     private var _binding: FragmentHomeBinding? = null
@@ -122,7 +122,7 @@ class HomeFragment : Fragment() {
         // Consolidated Weather List for Bottom Sheet
         if (sharedPref?.getString("consolidatedWeatherList", "") != ""){
             val json = sharedPref?.getString("consolidatedWeatherList", null)
-            val type = object : TypeToken<List<ConsolidatedWeather>>() {}.type
+            val type = object : TypeToken<Array<ConsolidatedWeather>>() {}.type
             consolidatedWeather = Gson().fromJson(json, type)
         }
 
@@ -165,13 +165,15 @@ class HomeFragment : Fragment() {
         // Card set on click listeners
         cards.forEachIndexed { index, cardView ->
             cardView.setOnClickListener {
-                if (!states.isNullOrEmpty()) {
-                    states[index]?.let { it1 ->
-                        showBottomSheetDialog(
-                            consolidatedWeather[index],
-                            location.text.toString(),
-                            it1
-                        )
+                if (!states.isNullOrEmpty() && !consolidatedWeather.isNullOrEmpty()) {
+                    states[index]?.let { state ->
+                        consolidatedWeather[index]?.let { consolidatedWeather ->
+                            showBottomSheetDialog(
+                                consolidatedWeather,
+                                location.text.toString(),
+                                state
+                            )
+                        }
                     }
                 } else {
                     Toast.makeText(activity, "Please wait...", Toast.LENGTH_SHORT).show()
@@ -277,7 +279,7 @@ class HomeFragment : Fragment() {
 
                         setWeatherIcon(imageView, it.consolidated_weather[index].weather_state_abbr)
                         homeTextViews[index].text = formatTemp(it.consolidated_weather[index].max_temp)
-                        consolidatedWeather.add(it.consolidated_weather[index])
+                        consolidatedWeather[index] = it.consolidated_weather[index]
 
                         states[index] = (it.consolidated_weather[index].weather_state_abbr)
                         with (sharedPref.edit()) {

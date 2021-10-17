@@ -20,4 +20,17 @@
         <item>kilometers</item>
         <item>miles</item>
     </string-array>
+
+    <!-- Speed Metric Preference -->
+    <string-array name="pressure_metric">
+        <item>Millibar (mbar)</item>
+        <item>Pound per square inch (PSI)</item>
+        <item>Pascal (pa)</item>
+    </string-array>
+
+    <string-array name="pressure_metric_values">
+        <item>mbar</item>
+        <item>psi</item>
+        <item>pascal</item>
+    </string-array>
 </resources>

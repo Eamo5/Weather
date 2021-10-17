@@ -30,6 +30,14 @@
             app:title="@string/speed_title"
             app:useSimpleSummaryProvider="true" />
 
+        <ListPreference
+            app:defaultValue="mbar"
+            app:entries="@array/pressure_metric"
+            app:entryValues="@array/pressure_metric_values"
+            app:key="pressure"
+            app:title="@string/pressure_title"
+            app:useSimpleSummaryProvider="true" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

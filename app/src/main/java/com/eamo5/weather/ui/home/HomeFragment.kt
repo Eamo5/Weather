@@ -272,7 +272,7 @@ class HomeFragment : Fragment() {
                         if (index == 0) {
                             setWeatherIcon(currentWeatherIcon,
                                 it.consolidated_weather[index].weather_state_abbr)
-                            currentTemp.text = formatTemp(it.consolidated_weather[0].the_temp)
+                            currentTemp.text = formatTemp(it.consolidated_weather[0].max_temp)
                         }
 
                         setWeatherIcon(imageView, it.consolidated_weather[index].weather_state_abbr)
@@ -373,19 +373,6 @@ class HomeFragment : Fragment() {
     // Convert from celsius to fahrenheit
     private fun convertToFahrenheit(temp: Int): Int {
         return (temp * 9/5) + 32
-    }
-
-    fun formatWindSpeed(speed: Double): String {
-        val prefManager = PreferenceManager.getDefaultSharedPreferences(context)
-        return if (prefManager.getString("speed", "") != "kilometers"){
-            speed.roundToInt().toString() + " mph"
-        } else {
-            convertToKilometers(speed).toString() + " km/h"
-        }
-    }
-
-    private fun convertToKilometers(miles: Double): Int  {
-        return (miles * 1.603).roundToInt()
     }
 
     // Show BottomSheetDialogFragment

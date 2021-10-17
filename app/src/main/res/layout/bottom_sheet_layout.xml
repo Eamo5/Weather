@@ -10,16 +10,18 @@
 
     <ImageView
         android:id="@+id/bottomSheetWeatherIcon"
-        android:layout_width="167dp"
-        android:layout_height="98dp"
+        android:layout_width="158dp"
+        android:layout_height="155dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintStart_toEndOf="@+id/linearLayout2"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_launcher_foreground" />
 
     <LinearLayout
         android:id="@+id/linearLayout2"
-        android:layout_width="201dp"
-        android:layout_height="168dp"
+        android:layout_width="215dp"
+        android:layout_height="261dp"
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -57,7 +59,28 @@
             android:id="@+id/bottomSheetSpeed"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Speed:"
+            android:text="Wind:"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+        <TextView
+            android:id="@+id/bottomSheetHumidity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Humidity:"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+        <TextView
+            android:id="@+id/bottomSheetAirPressure"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Air Pressure:"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+        <TextView
+            android:id="@+id/bottomSheetAirPredictability"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Predictability:"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     </LinearLayout>

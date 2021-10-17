@@ -208,7 +208,7 @@ class HomeFragment : Fragment() {
 
     private fun getLocationData(context: Context) {
 
-        val okHttpClient = retrofitCache(context, 5)
+        val okHttpClient = retrofitCache(context)
 
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
@@ -252,7 +252,7 @@ class HomeFragment : Fragment() {
 
     private fun getWeatherData(context: Context) {
 
-        val okHttpClient = retrofitCache(context, 5)
+        val okHttpClient = retrofitCache(context)
 
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
@@ -302,9 +302,9 @@ class HomeFragment : Fragment() {
         })
     }
 
-    private fun retrofitCache(context: Context, size: Int): OkHttpClient {
-        // 5mb cache
-        val cacheSize = (size * 1024 * 1024).toLong()
+    private fun retrofitCache(context: Context): OkHttpClient {
+        // 1mb cache
+        val cacheSize = (1 * 1024 * 1024).toLong()
         val myCache = Cache(context.cacheDir, cacheSize)
 
         val okHttpClient = OkHttpClient.Builder()

@@ -21,22 +21,25 @@ class WeatherBottomSheetDialog(private val data: ConsolidatedWeather,
         savedInstanceState: Bundle?
     ): View? {
         val binding = inflater.inflate(R.layout.bottom_sheet_layout, container, false)
+        // Set weather icon
         (parentFragment as HomeFragment).setWeatherIcon(
             binding.findViewById(R.id.bottomSheetWeatherIcon), state)
+
+        // BottomSheetDialog data
         binding.findViewById<TextView>(R.id.bottomSheetLocation).text = location
         binding.findViewById<TextView>(R.id.bottomSheetSummary).text = data.weather_state_name
-        binding.findViewById<TextView>(R.id.bottomSheetTempMax).text =
-            "Max: ${(parentFragment as HomeFragment).formatTemp(data.max_temp)}"
-        binding.findViewById<TextView>(R.id.bottomSheetTempMin).text =
-            "Min: ${(parentFragment as HomeFragment).formatTemp(data.min_temp)}"
-        binding.findViewById<TextView>(R.id.bottomSheetSpeed).text =
-            "Wind: ${data.wind_direction_compass + " " + formatWindSpeed(data.wind_speed)}"
-        binding.findViewById<TextView>(R.id.bottomSheetHumidity).text =
-            "Humidity: ${data.humidity}%"
-        binding.findViewById<TextView>(R.id.bottomSheetAirPressure).text =
-            "Pressure: ${convertAirPressure(data.air_pressure)}"
-        binding.findViewById<TextView>(R.id.bottomSheetAirPredictability).text =
-            "Predictability: ${data.predictability}%"
+        binding.findViewById<TextView>(R.id.bottomSheetTempMax).append(
+            " ${(parentFragment as HomeFragment).formatTemp(data.max_temp)}")
+        binding.findViewById<TextView>(R.id.bottomSheetTempMin).append(
+            " ${(parentFragment as HomeFragment).formatTemp(data.min_temp)}")
+        binding.findViewById<TextView>(R.id.bottomSheetSpeed).append(
+            " ${data.wind_direction_compass + " " + formatWindSpeed(data.wind_speed)}")
+        binding.findViewById<TextView>(R.id.bottomSheetHumidity).append(" ${data.humidity}%")
+        binding.findViewById<TextView>(R.id.bottomSheetAirPressure).append(
+            " ${convertAirPressure(data.air_pressure)}")
+        binding.findViewById<TextView>(R.id.bottomSheetAirPredictability).append(
+            " ${data.predictability}%")
+
         return binding
     }
 

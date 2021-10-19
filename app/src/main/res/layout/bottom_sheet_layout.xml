@@ -16,7 +16,8 @@
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toEndOf="@+id/linearLayout2"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_launcher_foreground" />
+        app:srcCompat="@drawable/ic_launcher_foreground"
+        tools:ignore="ImageContrastCheck" />
 
     <LinearLayout
         android:id="@+id/linearLayout2"
@@ -30,7 +31,6 @@
             android:id="@+id/bottomSheetLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="location"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textStyle="bold" />
 
@@ -38,49 +38,48 @@
             android:id="@+id/bottomSheetSummary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="summary"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <TextView
             android:id="@+id/bottomSheetTempMax"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Max:"
+            android:text="@string/max"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <TextView
             android:id="@+id/bottomSheetTempMin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Min:"
+            android:text="@string/min"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <TextView
             android:id="@+id/bottomSheetSpeed"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Wind:"
+            android:text="@string/wind"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <TextView
             android:id="@+id/bottomSheetHumidity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Humidity:"
+            android:text="@string/humidity"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <TextView
             android:id="@+id/bottomSheetAirPressure"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Air Pressure:"
+            android:text="@string/pressure"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <TextView
             android:id="@+id/bottomSheetAirPredictability"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Predictability:"
+            android:text="@string/predictability"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     </LinearLayout>

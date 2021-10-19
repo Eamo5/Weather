@@ -1,16 +1,24 @@
 <resources>
     <string name="app_name">Weather</string>
+
+    <!-- Fragment Titles -->
     <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
     <string name="title_settings">Settings</string>
-    <!-- Preference Titles -->
+
+    <!-- Preference Headers -->
     <string name="location_header">Location</string>
     <string name="metric_header">Metrics</string>
 
-    <!-- Metric Preferences -->
+    <!-- Preference Titles -->
     <string name="temperature_title">Temperature Metric</string>
-
     <string name="speed_title">Speed Metric</string>
-
     <string name="pressure_title">Pressure Metric</string>
+
+    <!-- Bottom Sheet Dialog -->
+    <string name="max">Max:</string>
+    <string name="min">Min:</string>
+    <string name="wind">Wind:</string>
+    <string name="humidity">Humidity:</string>
+    <string name="pressure">Pressure:</string>
+    <string name="predictability">Predictability:</string>
 </resources>

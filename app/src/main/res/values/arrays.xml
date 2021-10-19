@@ -21,7 +21,7 @@
         <item>miles</item>
     </string-array>
 
-    <!-- Speed Metric Preference -->
+    <!-- Pressure Metric Preference -->
     <string-array name="pressure_metric">
         <item>Millibar (mbar)</item>
         <item>Pound per square inch (PSI)</item>

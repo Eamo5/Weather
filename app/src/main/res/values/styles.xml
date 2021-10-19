@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- TextViews -->
     <style name="dashboardButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">@color/white</item>

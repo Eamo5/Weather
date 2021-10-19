@@ -20,8 +20,8 @@
 
     <LinearLayout
         android:id="@+id/linearLayout2"
-        android:layout_width="215dp"
-        android:layout_height="261dp"
+        android:layout_width="211dp"
+        android:layout_height="237dp"
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">

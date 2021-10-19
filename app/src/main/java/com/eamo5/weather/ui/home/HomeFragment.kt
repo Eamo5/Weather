@@ -1,11 +1,9 @@
 package com.eamo5.weather.ui.home
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -48,7 +46,6 @@ class HomeFragment : Fragment() {
     private lateinit var homeImageViews: List<ImageView>
     private var consolidatedWeather = arrayOfNulls<ConsolidatedWeather>(6)
     private val states = arrayOfNulls<String>(6)
-    private var woeid = 0
 
     private var _binding: FragmentHomeBinding? = null
 
@@ -70,7 +67,7 @@ class HomeFragment : Fragment() {
 
         // Get IDs
 
-        // Current Weather
+        // Current weather
         currentWeatherIcon = root.findViewById(R.id.weatherIcon)
         location = root.findViewById(R.id.location)
         currentTemp = root.findViewById(R.id.temperature)
@@ -103,9 +100,7 @@ class HomeFragment : Fragment() {
         )
 
         // API calls
-        activity?.let {
-            getLocationData(it)
-        }
+        activity?.let { getLocationData(it) }
 
         // Set days of week
         days.forEachIndexed { index, textView ->
@@ -117,10 +112,10 @@ class HomeFragment : Fragment() {
         }
 
         // Restore shared preferences
-        val sharedPref = this.activity?.getPreferences(Context.MODE_PRIVATE)
+        val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE)
 
-        // Consolidated Weather List for Bottom Sheet
-        if (sharedPref?.getString("consolidatedWeatherList", "") != ""){
+        // Retrieve consolidated weather json for BottomSheetDialog
+        if (sharedPref?.getString("consolidatedWeatherList", "") != "") {
             val json = sharedPref?.getString("consolidatedWeatherList", null)
             val type = object : TypeToken<Array<ConsolidatedWeather>>() {}.type
             consolidatedWeather = Gson().fromJson(json, type)
@@ -130,31 +125,32 @@ class HomeFragment : Fragment() {
         location.text = sharedPref?.getString("currentLocation", "-")
         currentTemp.text = sharedPref?.getString("currentTemp", "-")
 
-        // This weeks temperature
-        homeTextViews.forEachIndexed { index, textView ->
-            textView.text = sharedPref?.getString("day${index}Weather", "-")
-        }
-
-        // Corresponding ImageViews
+        // Set values for each day
+        // These can be separated into different loops but they have the same index
         homeImageViews.forEachIndexed { index, imageView ->
-            val string = sharedPref?.getString("state${index}", "-")
-            if (string != "-" && string != null) {
-                states[index] = string
-                setWeatherIcon(imageView, string)
-                if (index == 0) {
-                    setWeatherIcon(currentWeatherIcon, string)
+            val string = sharedPref?.getString("state${index}", "")
+
+            // Set weather icons
+            string?.let {
+                if (string.isNotEmpty()) {
+                    states[index] = string
+                    setWeatherIcon(imageView, string)
+                    if (index == 0) {
+                        setWeatherIcon(currentWeatherIcon, string)
+                    }
                 }
-
             }
-        }
 
-        // Observers
-        homeViewModel.daysList.forEachIndexed { index, mutableLiveData ->
-            mutableLiveData.observe(viewLifecycleOwner, { dayWeather ->
+            // Set temperature values
+            homeTextViews[index].text = sharedPref?.getString("day${index}Weather", "-")
+
+            // Add observers for days of week TextViews
+            homeViewModel.daysList[0].observe(viewLifecycleOwner, { dayWeather ->
                 homeTextViews[index].text = dayWeather
             })
         }
 
+        // Current location observers
         homeViewModel.currentLocation.observe(viewLifecycleOwner, { location ->
             this.location.text = location
         })
@@ -165,22 +161,17 @@ class HomeFragment : Fragment() {
         // Card set on click listeners
         cards.forEachIndexed { index, cardView ->
             cardView.setOnClickListener {
-                if (!states.isNullOrEmpty() && !consolidatedWeather.isNullOrEmpty()) {
-                    states[index]?.let { state ->
-                        consolidatedWeather[index]?.let { consolidatedWeather ->
-                            showBottomSheetDialog(
-                                consolidatedWeather,
-                                location.text.toString(),
-                                state
-                            )
-                        }
+                states[index]?.let { state ->
+                    consolidatedWeather[index]?.let { consolidatedWeather ->
+                        showBottomSheetDialog(
+                            consolidatedWeather,
+                            location.text.toString(),
+                            state
+                        )
                     }
-                } else {
-                    Toast.makeText(activity, "Please wait...", Toast.LENGTH_SHORT).show()
                 }
             }
         }
-
         return root
     }
 
@@ -188,16 +179,22 @@ class HomeFragment : Fragment() {
         super.onPause()
 
         // Saved shared preferences
-        val sharedPref: SharedPreferences? = this.activity?.getPreferences(Context.MODE_PRIVATE)
-        with (sharedPref?.edit()) {
-            this?.putString("currentLocation", location.text.toString())
-            this?.putString("currentTemp", currentTemp.text.toString())
+        val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE)
+        sharedPref?.let {
+            with (it.edit()) {
+                // Save current location and temperature
+                putString("currentLocation", location.text.toString())
+                putString("currentTemp", currentTemp.text.toString())
 
-            // Weather for days of week
-            homeTextViews.forEachIndexed { index, textView ->
-                this?.putString("day${index}Weather", textView.text.toString())
+                // Weather for days of week
+                homeTextViews.forEachIndexed { index, textView ->
+                    putString("day${index}Weather", textView.text.toString())
+                }
+
+                // Save json to SharedPreferences
+                putString("consolidatedWeatherList", Gson().toJson(consolidatedWeather))
+                apply()
             }
-            this?.apply()
         }
     }
 
@@ -206,6 +203,7 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 
+    // Get id for location
     private fun getLocationData(context: Context) {
 
         val okHttpClient = retrofitCache(context)
@@ -219,7 +217,6 @@ class HomeFragment : Fragment() {
 
         val prefManager = PreferenceManager.getDefaultSharedPreferences(context)
         val locationSetting = prefManager.getString("location", "Melbourne").toString()
-        Log.d("location", locationSetting)
 
         val retrofitGetData = retrofitBuilder.getLocationData(locationSetting)
 
@@ -229,29 +226,29 @@ class HomeFragment : Fragment() {
                 response: Response<List<LocationData>?>
             ) {
                 val responseBody = response.body()
+                var woeid = 0
 
                 if (responseBody != null) {
                     for (myData in responseBody) {
                         location.text = myData.location
                         woeid = myData.cityID
-                        getWeatherData(context)
+                        getWeatherData(context, woeid)
                     }
                 }
 
                 if (woeid == 0 ||
                     locationSetting.lowercase() != location.text.toString().lowercase())
                     Toast.makeText(context, "Invalid location", Toast.LENGTH_SHORT).show()
-
             }
 
             override fun onFailure(call: Call<List<LocationData>?>, t: Throwable) {
-                t.printStackTrace()
                 Toast.makeText(context, "Unable to reach API", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
-    private fun getWeatherData(context: Context) {
+    // Get weather data for location
+    private fun getWeatherData(context: Context, woeid: Int) {
 
         val okHttpClient = retrofitCache(context)
 
@@ -269,8 +266,10 @@ class HomeFragment : Fragment() {
                 val responseBody = response.body()
                 responseBody?.let {
                     val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE) ?: return
+
                     // Update weather images / states for each day
                     homeImageViews.forEachIndexed { index, imageView ->
+
                         // If today, set weather in overview
                         if (index == 0) {
                             setWeatherIcon(currentWeatherIcon,
@@ -278,32 +277,30 @@ class HomeFragment : Fragment() {
                             currentTemp.text = formatTemp(it.consolidated_weather[0].max_temp)
                         }
 
+                        // Set weather icons and temperature
                         setWeatherIcon(imageView, it.consolidated_weather[index].weather_state_abbr)
                         homeTextViews[index].text = formatTemp(it.consolidated_weather[index].max_temp)
-                        consolidatedWeather[index] = it.consolidated_weather[index]
 
-                        states[index] = (it.consolidated_weather[index].weather_state_abbr)
+                        // Add consolidated weather and weather state for BottomSheetDialog
+                        consolidatedWeather[index] = it.consolidated_weather[index]
+                        states[index] = it.consolidated_weather[index].weather_state_abbr
+
+                        // Save weather state to sharedPreferences
                         with (sharedPref.edit()) {
                             putString("state${index}", states[index])
                             apply()
                         }
                     }
-
-                    // Save associated weather abbreviation for restoring ImageView
-                    with (sharedPref.edit()) {
-                        putString("consolidatedWeatherList", Gson().toJson(consolidatedWeather))
-                        apply()
-                    }
                 }
             }
 
             override fun onFailure(call: Call<WeatherData?>, t: Throwable) {
-                t.printStackTrace()
                 Toast.makeText(context, "Unable to reach API", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
+    // Create cache for data retrieved
     private fun retrofitCache(context: Context): OkHttpClient {
         // 1mb cache
         val cacheSize = (1 * 1024 * 1024).toLong()
@@ -316,13 +313,15 @@ class HomeFragment : Fragment() {
                 request = if (hasNetwork(context))
                     request.newBuilder().header("Cache-Control", "public, max-age=" + 5).build()
                 else
-                    request.newBuilder().header("Cache-Control", "public, only-if-cached, max-stale=" + 60 * 60 * 24 * 7).build()
+                    request.newBuilder().header("Cache-Control",
+                        "public, only-if-cached, max-stale=" + 60 * 60 * 24 * 7).build()
                 chain.proceed(request)
             }
             .build()
         return okHttpClient
     }
 
+    // Check for network connectivity
     private fun hasNetwork(context: Context): Boolean {
         val isConnected: Boolean
         val connectivityManager =
@@ -382,6 +381,6 @@ class HomeFragment : Fragment() {
     // Show BottomSheetDialogFragment
     private fun showBottomSheetDialog(data: ConsolidatedWeather, location: String, state: String) {
         val bottomSheet = WeatherBottomSheetDialog(data, location, state)
-        bottomSheet.show(childFragmentManager, "medallistBottomSheet")
+        bottomSheet.show(childFragmentManager, "weatherBottomSheet")
     }
 }

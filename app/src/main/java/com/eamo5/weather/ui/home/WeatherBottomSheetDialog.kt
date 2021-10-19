@@ -1,7 +1,6 @@
 package com.eamo5.weather.ui.home
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +21,6 @@ class WeatherBottomSheetDialog(private val data: ConsolidatedWeather,
         savedInstanceState: Bundle?
     ): View? {
         val binding = inflater.inflate(R.layout.bottom_sheet_layout, container, false)
-        Log.d("TEST", state)
         (parentFragment as HomeFragment).setWeatherIcon(
             binding.findViewById(R.id.bottomSheetWeatherIcon), state)
         binding.findViewById<TextView>(R.id.bottomSheetLocation).text = location

@@ -13,6 +13,4 @@ interface WeatherApi {
     @GET("{woeid}")
     fun getWeatherData(@Path("woeid") woeid: Int): Call<WeatherData>
 
-    /*@GET("1103816")
-    fun getConsolidatedWeather(): Call<ConsolidatedWeather>*/
 }

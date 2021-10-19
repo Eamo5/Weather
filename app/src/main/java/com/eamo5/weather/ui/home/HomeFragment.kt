@@ -246,6 +246,7 @@ class HomeFragment : Fragment() {
 
             override fun onFailure(call: Call<List<LocationData>?>, t: Throwable) {
                 t.printStackTrace()
+                Toast.makeText(context, "Unable to reach API", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -298,6 +299,7 @@ class HomeFragment : Fragment() {
 
             override fun onFailure(call: Call<WeatherData?>, t: Throwable) {
                 t.printStackTrace()
+                Toast.makeText(context, "Unable to reach API", Toast.LENGTH_SHORT).show()
             }
         })
     }

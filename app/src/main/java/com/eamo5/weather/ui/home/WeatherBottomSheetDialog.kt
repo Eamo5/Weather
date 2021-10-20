@@ -12,8 +12,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlin.math.roundToInt
 
 class WeatherBottomSheetDialog(private val data: ConsolidatedWeather,
-                               private val location: String,
-                               private val state: String) : BottomSheetDialogFragment() {
+                               private val location: String) : BottomSheetDialogFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -23,7 +22,7 @@ class WeatherBottomSheetDialog(private val data: ConsolidatedWeather,
         val binding = inflater.inflate(R.layout.bottom_sheet_layout, container, false)
         // Set weather icon
         (parentFragment as HomeFragment).setWeatherIcon(
-            binding.findViewById(R.id.bottomSheetWeatherIcon), state)
+            binding.findViewById(R.id.bottomSheetWeatherIcon), data.weather_state_abbr)
 
         // BottomSheetDialog data
         binding.findViewById<TextView>(R.id.bottomSheetLocation).text = location
@@ -37,7 +36,7 @@ class WeatherBottomSheetDialog(private val data: ConsolidatedWeather,
         binding.findViewById<TextView>(R.id.bottomSheetHumidity).append(" ${data.humidity}%")
         binding.findViewById<TextView>(R.id.bottomSheetAirPressure).append(
             " ${convertAirPressure(data.air_pressure)}")
-        binding.findViewById<TextView>(R.id.bottomSheetAirPredictability).append(
+        binding.findViewById<TextView>(R.id.bottomSheetPredictability).append(
             " ${data.predictability}%")
 
         return binding
@@ -45,7 +44,7 @@ class WeatherBottomSheetDialog(private val data: ConsolidatedWeather,
 
     private fun formatWindSpeed(speed: Double): String {
         val prefManager = PreferenceManager.getDefaultSharedPreferences(context)
-        return if (prefManager.getString("speed", "") != "kilometers"){
+        return if (prefManager.getString("speed", "kilometers") != "kilometers"){
             speed.roundToInt().toString() + " mph"
         } else {
             convertToKilometers(speed).toString() + " km/h"

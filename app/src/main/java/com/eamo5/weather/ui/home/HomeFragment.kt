@@ -34,8 +34,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
 
-const val BASE_URL = "https://www.metaweather.com/api/location/"
-
 class HomeFragment : Fragment() {
 
     private lateinit var homeViewModel: HomeViewModel
@@ -45,7 +43,7 @@ class HomeFragment : Fragment() {
     private lateinit var homeTextViews: List<TextView>
     private lateinit var homeImageViews: List<ImageView>
     private var consolidatedWeather = arrayOfNulls<ConsolidatedWeather>(6)
-    private val states = arrayOfNulls<String>(6)
+    private val baseUrl = "https://www.metaweather.com/api/location/"
 
     private var _binding: FragmentHomeBinding? = null
 
@@ -114,7 +112,7 @@ class HomeFragment : Fragment() {
         // Restore shared preferences
         val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE)
 
-        // Retrieve consolidated weather json for BottomSheetDialog
+        // Retrieve consolidated weather json
         if (sharedPref?.getString("consolidatedWeatherList", "") != "") {
             val json = sharedPref?.getString("consolidatedWeatherList", null)
             val type = object : TypeToken<Array<ConsolidatedWeather>>() {}.type
@@ -123,31 +121,25 @@ class HomeFragment : Fragment() {
 
         // Today
         location.text = sharedPref?.getString("currentLocation", "-")
-        currentTemp.text = sharedPref?.getString("currentTemp", "-")
+        currentTemp.text = consolidatedWeather[0]?.let { formatTemp(it.max_temp) }
 
         // Set values for each day
         // These can be separated into different loops but they have the same index
         homeImageViews.forEachIndexed { index, imageView ->
-            val string = sharedPref?.getString("state${index}", "")
-
             // Set weather icons
-            string?.let {
-                if (string.isNotEmpty()) {
-                    states[index] = string
-                    setWeatherIcon(imageView, string)
-                    if (index == 0) {
-                        setWeatherIcon(currentWeatherIcon, string)
-                    }
+            consolidatedWeather[index]?.let {
+                setWeatherIcon(imageView, it.weather_state_abbr)
+                if (index == 0) {
+                    setWeatherIcon(currentWeatherIcon, it.weather_state_abbr)
                 }
+                // Set temperature values
+                homeTextViews[index].text = formatTemp(it.max_temp)
+
+                // Add observers for days of week TextViews
+                homeViewModel.daysList[index].observe(viewLifecycleOwner, { dayWeather ->
+                    homeTextViews[index].text = dayWeather
+                })
             }
-
-            // Set temperature values
-            homeTextViews[index].text = sharedPref?.getString("day${index}Weather", "-")
-
-            // Add observers for days of week TextViews
-            homeViewModel.daysList[0].observe(viewLifecycleOwner, { dayWeather ->
-                homeTextViews[index].text = dayWeather
-            })
         }
 
         // Current location observers
@@ -161,14 +153,10 @@ class HomeFragment : Fragment() {
         // Card set on click listeners
         cards.forEachIndexed { index, cardView ->
             cardView.setOnClickListener {
-                states[index]?.let { state ->
-                    consolidatedWeather[index]?.let { consolidatedWeather ->
-                        showBottomSheetDialog(
-                            consolidatedWeather,
-                            location.text.toString(),
-                            state
-                        )
-                    }
+                consolidatedWeather[index]?.let { consolidatedWeather ->
+                    val bottomSheet = WeatherBottomSheetDialog(consolidatedWeather,
+                        location.text.toString())
+                    bottomSheet.show(childFragmentManager, "weatherBottomSheet")
                 }
             }
         }
@@ -184,14 +172,8 @@ class HomeFragment : Fragment() {
             with (it.edit()) {
                 // Save current location and temperature
                 putString("currentLocation", location.text.toString())
-                putString("currentTemp", currentTemp.text.toString())
 
-                // Weather for days of week
-                homeTextViews.forEachIndexed { index, textView ->
-                    putString("day${index}Weather", textView.text.toString())
-                }
-
-                // Save json to SharedPreferences
+                // Save JSON to SharedPreferences
                 putString("consolidatedWeatherList", Gson().toJson(consolidatedWeather))
                 apply()
             }
@@ -210,7 +192,7 @@ class HomeFragment : Fragment() {
 
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl(BASE_URL)
+            .baseUrl(baseUrl)
             .client(okHttpClient)
             .build()
             .create(WeatherApi::class.java)
@@ -228,7 +210,7 @@ class HomeFragment : Fragment() {
                 val responseBody = response.body()
                 var woeid = 0
 
-                if (responseBody != null) {
+                responseBody?.let {
                     for (myData in responseBody) {
                         location.text = myData.location
                         woeid = myData.cityID
@@ -254,7 +236,7 @@ class HomeFragment : Fragment() {
 
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl(BASE_URL)
+            .baseUrl(baseUrl)
             .client(okHttpClient)
             .build()
             .create(WeatherApi::class.java)
@@ -265,7 +247,8 @@ class HomeFragment : Fragment() {
             override fun onResponse(call: Call<WeatherData?>, response: Response<WeatherData?>) {
                 val responseBody = response.body()
                 responseBody?.let {
-                    val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE) ?: return
+                    // Prevent NPE on Context.getPackageName()
+                    activity ?: return
 
                     // Update weather images / states for each day
                     homeImageViews.forEachIndexed { index, imageView ->
@@ -274,22 +257,16 @@ class HomeFragment : Fragment() {
                         if (index == 0) {
                             setWeatherIcon(currentWeatherIcon,
                                 it.consolidated_weather[index].weather_state_abbr)
-                            currentTemp.text = formatTemp(it.consolidated_weather[0].max_temp)
+                            currentTemp.text = formatTemp(it.consolidated_weather[index].max_temp)
                         }
 
                         // Set weather icons and temperature
                         setWeatherIcon(imageView, it.consolidated_weather[index].weather_state_abbr)
-                        homeTextViews[index].text = formatTemp(it.consolidated_weather[index].max_temp)
+                        homeTextViews[index].text =
+                            formatTemp(it.consolidated_weather[index].max_temp)
 
-                        // Add consolidated weather and weather state for BottomSheetDialog
+                        // Add consolidated weather for BottomSheetDialog
                         consolidatedWeather[index] = it.consolidated_weather[index]
-                        states[index] = it.consolidated_weather[index].weather_state_abbr
-
-                        // Save weather state to sharedPreferences
-                        with (sharedPref.edit()) {
-                            putString("state${index}", states[index])
-                            apply()
-                        }
                     }
                 }
             }
@@ -311,10 +288,14 @@ class HomeFragment : Fragment() {
             .addInterceptor { chain ->
                 var request = chain.request()
                 request = if (hasNetwork(context))
-                    request.newBuilder().header("Cache-Control", "public, max-age=" + 5).build()
+                    /* If internet is available, get the cached stored in the last 60 seconds.
+                    Otherwise discard and update it again */
+                    request.newBuilder().header("Cache-Control", "public, max-age=" + 60).build()
                 else
+                /* If internet is not available, get the cached stored in the last 24 hours.
+                Otherwise error */
                     request.newBuilder().header("Cache-Control",
-                        "public, only-if-cached, max-stale=" + 60 * 60 * 24 * 7).build()
+                        "public, only-if-cached, max-stale=" + 60 * 60 * 24).build()
                 chain.proceed(request)
             }
             .build()
@@ -341,24 +322,24 @@ class HomeFragment : Fragment() {
     fun setWeatherIcon(image: ImageView, state: String) {
         activity?.let {
             when (state) {
-                "c" -> image.setImageDrawable(AppCompatResources.getDrawable
-                    (it, R.drawable.ic_clear))
+                "c" -> image.setImageDrawable(AppCompatResources.getDrawable(
+                    it, R.drawable.ic_clear))
                 "hc" -> image.setImageDrawable((AppCompatResources.getDrawable(
                     it, R.drawable.ic_heavy_cloud)))
-                "hr" -> image.setImageDrawable((AppCompatResources.getDrawable
-                    (it, R.drawable.ic_heavy_rain)))
-                "lc" -> image.setImageDrawable((AppCompatResources.getDrawable
-                    (it, R.drawable.ic_light_cloud)))
-                "lr" -> image.setImageDrawable((AppCompatResources.getDrawable
-                    (it, R.drawable.ic_light_rain)))
-                "s" -> image.setImageDrawable((AppCompatResources.getDrawable
-                    (it, R.drawable.ic_showers)))
-                "sl" -> image.setImageDrawable((AppCompatResources.getDrawable
-                    (it, R.drawable.ic_sleet)))
-                "sn" -> image.setImageDrawable((AppCompatResources.getDrawable
-                    (it, R.drawable.ic_snow)))
-                "t" -> image.setImageDrawable((AppCompatResources.getDrawable
-                    (it, R.drawable.ic_thunderstorm)))
+                "hr" -> image.setImageDrawable((AppCompatResources.getDrawable(
+                    it, R.drawable.ic_heavy_rain)))
+                "lc" -> image.setImageDrawable((AppCompatResources.getDrawable(
+                    it, R.drawable.ic_light_cloud)))
+                "lr" -> image.setImageDrawable((AppCompatResources.getDrawable(
+                    it, R.drawable.ic_light_rain)))
+                "s" -> image.setImageDrawable((AppCompatResources.getDrawable(
+                    it, R.drawable.ic_showers)))
+                "sl" -> image.setImageDrawable((AppCompatResources.getDrawable(
+                    it, R.drawable.ic_sleet)))
+                "sn" -> image.setImageDrawable((AppCompatResources.getDrawable(
+                    it, R.drawable.ic_snow)))
+                "t" -> image.setImageDrawable((AppCompatResources.getDrawable(
+                    it, R.drawable.ic_thunderstorm)))
             }
         }
     }
@@ -376,11 +357,5 @@ class HomeFragment : Fragment() {
     // Convert from celsius to fahrenheit
     private fun convertToFahrenheit(temp: Int): Int {
         return (temp * 9/5) + 32
-    }
-
-    // Show BottomSheetDialogFragment
-    private fun showBottomSheetDialog(data: ConsolidatedWeather, location: String, state: String) {
-        val bottomSheet = WeatherBottomSheetDialog(data, location, state)
-        bottomSheet.show(childFragmentManager, "weatherBottomSheet")
     }
 }

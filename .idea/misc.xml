@@ -11,9 +11,9 @@
         <entry key="app/src/main/res/drawable/ic_snow.xml" value="0.17135416666666667" />
         <entry key="app/src/main/res/drawable/ic_thermostat_black_24dp.xml" value="0.25833333333333336" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.16549259203702246" />
-        <entry key="app/src/main/res/layout/bottom_sheet_layout.xml" value="0.165" />
+        <entry key="app/src/main/res/layout/bottom_sheet_layout.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_dashboard.xml" value="0.1287037037037037" />
-        <entry key="app/src/main/res/layout/fragment_home.xml" value="0.1908256880733945" />
+        <entry key="app/src/main/res/layout/fragment_home.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_locations.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_locations_list.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_notifications.xml" value="0.15520833333333334" />
